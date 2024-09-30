@@ -26,11 +26,18 @@ verify_nvm() {
 # Update package index and install dependencies
 echo "Installing dependencies..."
 sudo apt update
-sudo apt install -y nginx git curl
+sudo apt install -y git curl jq
+sudo apt install -y nginx
+
+# install aws-cli
+snap install aws-cli --classic
 
 
-#Postgres Setup
+# Postgres Setup
 sudo apt install -y postgresql postgresql-contrib
+
+#install all Dependieces
+sleep 30
 
 # Set up SSH directory
 echo "Setting up SSH directory..."
@@ -49,6 +56,14 @@ chmod 600 ~/.ssh/id_rsa
 # Clone or update private git repository
 echo "Cloning/updating private Git repository..."
 git clone "${GITHUB_REPO}" /var/www/app || (cd /var/www/app && git pull)
+
+# Retrieve .env file from AWS Secrets Manager
+echo "Retrieving .env file from AWS Secrets Manager..."
+aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+aws configure set region "${AWS_REGION}"
+
+aws secretsmanager get-secret-value --secret-id "${SECRET_NAME}" --query SecretString --output text | jq -r 'to_entries | map("\(.key)=\(.value)") | .[]' > /var/www/app/.env
 
 # Install NVM
 echo "Installing NVM..."
@@ -75,12 +90,12 @@ source ~/.bashrc
 # Verify that NVM is loaded
 verify_nvm
 
-#Postgres ROLE, DATABASE SETUP
+# # Postgres ROLE, DATABASE SETUP
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD' SUPERUSER;"
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 
-# change  Auth peer to md5
+# change Auth peer to md5
 PG_HBA_CONF="/etc/postgresql/16/main/pg_hba.conf"
 sudo sed -i "s/local   all             all                                     peer/local   all             all                                     md5/" $PG_HBA_CONF
 sudo systemctl restart postgresql
