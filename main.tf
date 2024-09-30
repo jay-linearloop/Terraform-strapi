@@ -38,7 +38,7 @@ resource "digitalocean_droplet" "web_server" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/script.sh",
-      "SSH_PRIVATE_KEY='${file(var.ssh_private_key_path)}' AWS_ACCESS_KEY='${var.aws_access_key}' AWS_SECRET_KEY='${var.aws_secret_key}' SECRET_NAME='${var.secret_name}' AWS_REGION='${var.aws_region}' GITHUB_REPO='${var.github_repo}' NODE_VERSION='${var.node_version}' DOMAIN_NAME='${var.domain_name}' DB_USER='${var.db_user}' DB_NAME='${var.db_name}' DB_PASSWORD='${var.db_password}' bash /tmp/script.sh"
+      "SSH_PRIVATE_KEY='${file(var.ssh_private_key_path)}' GITHUB_REPO='${var.github_repo}' NODE_VERSION='${var.node_version}' DOMAIN_NAME='${var.domain_name}' DB_USER='${var.db_user}' DB_NAME='${var.db_name}' DB_PASSWORD='${var.db_password}' bash /tmp/script.sh"
     ]
   }
 }

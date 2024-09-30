@@ -58,22 +58,3 @@ variable "db_name" {
   description = "Database name"
   type        = string
 }
-
-variable "aws_access_key" {
-  description = "Access Key for AWS"
-  type        = string
-}
-
-variable "aws_secret_key" {
-  description = "Secret Key for AWS"
-  type        = string
-}
-
-variable "secret_name" {
-  description = "secret for env"
-  type        = string
-}
-
-variable "aws_region" {
-  description = "AWS Region"
-}
