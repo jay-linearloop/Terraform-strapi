@@ -5,7 +5,7 @@ check_command() {
   command -v "$1" &> /dev/null
 }
 
-# Function to verify if NVM is properly loaded
+# Function to verify if NVM is properly loadedfff
 verify_nvm() {
   if check_command nvm; then
     echo "NVM is loaded."
